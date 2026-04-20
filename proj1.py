@@ -67,7 +67,7 @@ def emissions_per_capita(rc: RegionCondition) -> float:
     return rc.ghg_rate / rc.pop
 
 def area(gr: GlobeRect) -> float:
-    if not isinstance(gr, GlobeRect): raise TypeError("Input must be a GlobdeRect")
+    if not isinstance(gr, GlobeRect): raise TypeError("Input must be a GlobeRect")
     dx = gr.east_long - gr.west_long
     if dx < 0: dx += 360
     dx *= (2*math.pi/360)
@@ -82,13 +82,13 @@ def emissions_per_square_km(rc: RegionCondition) -> float:
     return(rc.ghg_rate/sqr_km)
 
 def densest(rc_list: list[RegionCondition]) -> str:
+    if not isinstance(rc_list, list): raise TypeError("Input must be a list")
     if len(rc_list) == 0: raise ValueError("List of RegionConditions is empty")
     result = densest_helper(rc_list)
     return result[1]
-    
 
 def densest_helper(rc_list: list[RegionCondition]) -> tuple[float, str]:
-    if not isinstance(rc_list[0], RegionCondition): raise TypeError("List must contain exclusively RegionContition objects")
+    if not isinstance(rc_list[0], RegionCondition): raise TypeError("List must contain exclusively RegionCondition objects")
     d1 = rc_list[0].pop / area(rc_list[0].region.rect)
     if len(rc_list) == 1:
         return (d1, rc_list[0].region.name)
@@ -102,7 +102,7 @@ def densest_helper(rc_list: list[RegionCondition]) -> tuple[float, str]:
 
 def project_condition(rc: RegionCondition, years: int) -> RegionCondition:
     if not isinstance(rc, RegionCondition): raise TypeError("Input must be a RegionCondition")
-    if not isinstance(years, int): raise TypeError("years must be of type int")
+    if isinstance(years, bool) or not isinstance(years, int): raise TypeError("years must be of type int")
     if years <= 0: raise ValueError("years must be greater than 0")
     growth_rate = get_growth_rate(rc.region)
     emissions_pc = emissions_per_capita(rc)
@@ -110,14 +110,16 @@ def project_condition(rc: RegionCondition, years: int) -> RegionCondition:
     new_emissions = emissions_pc*new_pop
     return RegionCondition(rc.region, rc.year + years, new_pop, new_emissions)
 
-
-
 def grow_pop(pop: int, rate: float, years: int) -> int:
+    if not isinstance(pop, int): raise TypeError("pop must be of type int")
+    if not isinstance(rate, float): raise TypeError("rate must be of type float")
+    if not isinstance(years, int): raise TypeError("years must be of type int")
     if years == 1:
         return int(pop + (pop*rate))
     return grow_pop(int(pop + (pop*rate)), rate, years-1)
 
 def get_growth_rate(r: Region) -> float:
+    if not isinstance(r, Region): raise TypeError("Input must be a Region")
     if r.terrain == "ocean":
         return 0.0001
     elif r.terrain == "mountains":
